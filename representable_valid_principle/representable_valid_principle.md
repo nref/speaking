@@ -395,6 +395,16 @@ Applying MIRO
 <!-- incremental_lists: true -->
 
 <!-- pause -->
+Algorithm for fixing invalid states:
+
+![](fixagram.png)
+
+
+Applying MIRO
+---
+<!-- incremental_lists: true -->
+
+<!-- pause -->
 
 <!-- column_layout: [1, 1] -->
 
