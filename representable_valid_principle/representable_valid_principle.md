@@ -186,7 +186,7 @@ The Representable/Valid Principle (RVP)
 <!-- pause -->
 ## Representable/Valid Principle (RVP)
 
-*Keep a one-to-one correspondence between representable and valid states of the program.*
+*Keep a one-to-one correspondence between representable (concrete) and valid (abstract) states of the program.*
 
 <!-- pause -->
 ![one-to-one](one-to-one.png)
@@ -245,8 +245,8 @@ int OutsideTemperature { get; set; }
 
 <!-- pause -->
 - What if the value is not known?
-- There are two abstract states: value known, not known
-- There is one concrete state: the value
+- There are two abstract states (valid states): value known, not known
+- There is one concrete states (representable states): the value
 
 <!-- pause -->
 Slightly better:
