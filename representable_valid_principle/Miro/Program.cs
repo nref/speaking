@@ -1,7 +1,7 @@
 ﻿var thermostat = new BetterThermostat(
-    new HeatState(new Setpoint(new Fahrenheit(72))),
+    new HeatState(new Setpoint(new Celsius(25))),
     new Reading(new Fahrenheit(70)),
-    new FetchingState());
+    new FetchInProgress());
 
 static class ThermostatValidator
 {
@@ -10,7 +10,7 @@ static class ThermostatValidator
     && !(t.IsHeatOn && t.IsCoolOn)
     && ((t.IsOn && t.Setpoint >= 0) || (!t.IsOn && t.Setpoint < 0));
 
-    public static bool IsValid(BetterThermostat t) => true;
+    public static bool IsValid(BetterThermostat _) => true;
 }
 
 // Thermostat abstract state:
@@ -87,9 +87,9 @@ record BuggyThermostat4(
     Reading? OutsideTemp = null);
 
 abstract record FetchState;
-record NotFetchedState : FetchState;
-record FetchingState : FetchState;
-record FetchErrorState(string Message) : FetchState;
-record FetchedState(Reading Temperature) : FetchState;
+record NotFetched : FetchState;
+record FetchInProgress : FetchState;
+record FetchError(string Message) : FetchState;
+record Fetched(Reading Temperature) : FetchState;
 
 record BetterThermostat(RunState RunState, Reading InsideTemp, FetchState OutsideTemp);

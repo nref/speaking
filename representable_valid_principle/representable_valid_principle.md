@@ -22,7 +22,7 @@ Contents
   - Concrete State
 - The Representable/Valid Principle (RVP)
 - MIRO
-- Applying MIRO
+  - Applying MIRO
 - Quiz
 - Summary
 - Resources
@@ -49,10 +49,10 @@ Goals
 ---
 <!-- incremental_lists: true -->
 
-- Make bugs impossible
 - Define state, abstract state, and concrete state
 - Define the Representable/Valid principle
 - Learn MIRO: The 4 incorrect mappings between abstract state and concrete state
+- Make bugs impossible
 
 Intro
 ---
@@ -91,7 +91,7 @@ Abstract State
 <!-- incremental_lists: true -->
 
 <!-- pause -->
-- An **abstraction** is a mapping from a complex set to a simpler one.
+An **abstraction** is a mapping from a complex set to a simpler one.
 
 <!-- pause -->
 Q: What is abstract state?
@@ -189,7 +189,10 @@ The Representable/Valid Principle (RVP)
 *Keep a one-to-one correspondence between representable and valid states of the program.*
 
 <!-- pause -->
-In other words, make it impossible to even compile bugs.
+![one-to-one](one-to-one.png)
+
+<!-- pause -->
+In other words, make it impossible to even represent bugs.
 
 <!-- pause -->
 How do we do that?
@@ -198,8 +201,12 @@ MIRO
 ---
 <!-- incremental_lists: true -->
 
+<!-- column_layout: [2, 1] -->
+<!-- column: 1 -->
+![one-to-one](one-to-one.png)
+<!-- column: 0 -->
 <!-- pause -->
-In Keeping with the RVP, we want a one-to-one mapping between the abstract state and concrete state.
+In keeping with the RVP, we want a one-to-one mapping between the abstract state and concrete state.
 
 <!-- pause -->
 **MIRO** is an acronym for the 4 incorrect mappings:
@@ -213,6 +220,8 @@ In Keeping with the RVP, we want a one-to-one mapping between the abstract state
 <!-- pause -->
 ![MIRO quadrant](miro_quadrant.png)
 
+<!-- reset_layout-->
+
 Missing States
 ---
 <!-- incremental_lists: true -->
@@ -220,11 +229,11 @@ Missing States
 <!-- column_layout: [2, 1] -->
 
 <!-- column: 1 -->
-![MIRO quadrant](miro_quadrant.png)
+![MIRO quadrant](miro_quadrant_highlight_missing.png)
 
 <!-- column: 0 -->
 <!-- pause -->
-- There are abstract states that the concrete states cannot express.
+-> There are abstract states that the concrete states cannot express.
 
 <!-- pause -->
 Example: Not having an `Error` or `Option` state
@@ -256,11 +265,11 @@ Illegal States
 <!-- column_layout: [2, 1] -->
 
 <!-- column: 1 -->
-![MIRO quadrant](miro_quadrant.png)
+![MIRO quadrant](miro_quadrant_highlight_illegal.png)
 
 <!-- column: 0 -->
 <!-- pause -->
-- There are concrete states that have no mapping to an abstract state.
+-> There are concrete states that have no mapping to an abstract state.
 
 <!-- pause -->
 Example: A setting that enables other settings
@@ -298,12 +307,11 @@ Redundant States
 <!-- column_layout: [2, 1] -->
 
 <!-- column: 1 -->
-![MIRO quadrant](miro_quadrant.png)
+![MIRO quadrant](miro_quadrant_highlight_redundant.png)
 
 <!-- column: 0 -->
 <!-- pause -->
-- There is more than one way to represent an abstract state.
-- They can also be interpreted as illegal states.
+-> There is more than one way to represent an abstract state.
 
 <!-- pause -->
 Example:
@@ -342,17 +350,21 @@ Overloaded States
 <!-- column_layout: [2, 1] -->
 
 <!-- column: 1 -->
-![MIRO quadrant](miro_quadrant.png)
+![MIRO quadrant](miro_quadrant_highlight_overloaded.png)
 
 <!-- column: 0 -->
 <!-- pause -->
-- There is one concrete state representing two or more abstract states.
+-> There is one concrete state representing two or more abstract states.
 
 <!-- pause -->
 Example: A chat app that says "no messages", then suddenly shows them.
 
 <!-- pause -->
-The app cannot represent the difference between the abstract states "fetching messages" and "there are no messages".
+The app cannot represent the difference between the abstract states 
+  - "haven't fetched messages yet"
+  - "fetching messages" 
+  - "fetching messages failed"
+  - "there are no messages"
 
 
 <!-- pause -->
@@ -448,7 +460,10 @@ new BuggyThermostat(
 <!-- column: 1 -->
 
 <!-- pause -->
-This solution resolves all of these bugs:
+One solution:
+- Use the C# type system to make these bugs unrepresentable.
+- The bugs will not even compile.
+- Bonus: It is EDP-compliant
 
 <!-- pause -->
 ```csharp
@@ -475,11 +490,14 @@ record CoolState(Setpoint Setpoint) : RunState;
 <!-- pause -->
 ```csharp
 abstract record FetchState;
-record NotFetchedState : FetchState;
-record FetchingState : FetchState;
-record FetchErrorState(string Message) : FetchState;
-record FetchedState(Reading Temperature) : FetchState;
+record NotFetched : FetchState;
+record FetchInProgress : FetchState;
+record FetchError(string Message) : FetchState;
+record Fetched(Reading Temperature) : FetchState;
 ```
+
+<!-- pause -->
+The new thermostat:
 
 <!-- pause -->
 ```csharp
@@ -490,11 +508,14 @@ record BetterThermostat(
 ```
 
 <!-- pause -->
+Example use:
+
+<!-- pause -->
 ```csharp
 var thermostat = new BetterThermostat(
-    new HeatState(new Setpoint(new Fahrenheit(72))),
-    new Reading(new Fahrenheit(70)),
-    new FetchingState());
+    new HeatState(new Setpoint(new Celsius(25))),
+    new Reading(new Fahrenheit(72)),
+    new FetchInProgress());
 ```
 
 <!-- reset_layout -->
@@ -556,8 +577,12 @@ bool IsValid(BetterThermostat t) => true;
 <!-- reset_layout -->
 
 <!-- pause -->
+<!-- column_layout: [1, 1, 1] -->
+<!-- column: 1 -->
 - What are the chances there is a bug on the left?
 - What are the chances there is a bug on the right?
+- Design view: We moved risk from runtime to compile time
+<!-- reset_layout -->
 
 Quiz
 ---
@@ -601,10 +626,10 @@ Summary
 
 <!-- pause -->
 - Defensive code is a smell. It implies the possibility for bugs.
-- Often manifests as conditionals and `try`.
 
 <!-- pause -->
 ```csharp
+// I smell bugs
 try {
   bool ok = DoThing();
   if (!ok) ...
@@ -618,6 +643,7 @@ catch (OtherException) {
 ```
 
 <!-- pause -->
+- Often manifests as conditionals and `try`.
 - A program with no representable invalid states cannot have bugs.
 
 <!-- pause -->
@@ -636,9 +662,7 @@ Resources
 ---
 
 - [](https://note89.github.io/state-of-emergency/)
-
+- [](https://github.com/nref/speaking/tree/main/representable_valid_principle)
 
 Discussion
 ---
-
-![](discussion.png)
