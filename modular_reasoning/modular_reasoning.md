@@ -16,10 +16,9 @@ About Me
 - Coding since 1999
 - BS Computer Science 2013
 - MS Computer Science 2014
-- C#, C++, Python, more
-- 10 years medical device software
-  - robust QA
-- 4 months at Climavision
+- C#, XAML, Python, C, C++, more
+- 10 years in radiotherapy software - patient positioning
+- 8 days at Radformation
 
 Contents
 ---
@@ -39,11 +38,23 @@ Contents
 - Summary
 - Resources
 
+Intro
+---
+<!-- incremental_lists: true -->
+
+- Fact: Humans can keep about 7 things in working memory
+- Fact: Programs contain more than 7 things
+  - usually by orders of magnitude
+
+<!-- pause -->
+**Q: How do we write programs that humans can reason about?**
+
 Goals
 ---
 <!-- incremental_lists: true -->
 
 <!-- pause -->
+- Help you write understandable code
 - Teach design-level thinking
 - Improve code quality
 
@@ -52,7 +63,10 @@ Motivating Quiz
 <!-- incremental_lists: true -->
 
 <!-- pause -->
-Question: As part of a large application, you are reading an input and need to escape all single quotes. Which of these two options is better and why? Assume both do the exact same thing.
+Q: As part of a large application, you are reading an input and need to escape all single quotes. 
+
+<!-- pause -->
+Which of these two options is better and why? Assume both assign the same value to x.
 
 <!-- pause -->
 ```python
@@ -80,10 +94,10 @@ Question: As part of a large application, you are reading an input and need to e
 **Answer: B**
 
 <!-- pause -->
-Question: How could something that always works be incorrect?
+Q: How could something that always works be incorrect?
 
 <!-- pause -->
-**Answer: Errors in modular reasoning.**
+**A: Errors in modular reasoning.**
 
 <!-- pause -->
 Source: [](https://mirdin.com/quizzes/software-design-quiz/)
@@ -93,7 +107,7 @@ Motivating Quiz
 <!-- incremental_lists: true -->
 
 <!-- pause -->
-Question: Which is correct?
+Q: Which is correct?
 
 <!-- pause -->
 ```python
@@ -105,22 +119,23 @@ write(stdout, "foo", len)
 ```
 
 <!-- pause -->
-**Answer: The second**
+**A: The second**
 
 <!-- pause -->
-Question: Why?
+Q: Why?
 
 <!-- pause -->
-Answer: The first is incorrect because 
+A: The first is incorrect because 
 
 <!-- pause -->
 - It is not possible to know that it works without making assumptions about the rest of the system.
 - The number `1` is *a secret to another module*. 
+  - Namely, the system's implementation of the POSIX standard
 - Even though it works now, this secret could change without notice.
-- The idea of the number `1` and the idea of the stream `stdout` are different, even though they are the same in implementation *right now*.
+- The idea of the number `1` and the idea of the stream `stdout` are distinct, even though they are the same in implementation *right now*.
 
 <!-- pause -->
-The *implementation/interface distinction* states that the guarantees of what a function must do are different from what it actually does.
+-> The *implementation/interface distinction* states that the specification of what code must do is distinct from what the code actually does.
 
 Motivating Quiz
 ---
@@ -148,7 +163,22 @@ What is a Module?
   - The secret is shared internally
   - The secret is concealed externally
 
-What is a Module > Example Forms > Functions
+What is a Module > Many Forms
+---
+<!-- incremental_lists: true -->
+
+<!-- pause -->
+There are many ways to express modularity in progamming languages.
+
+<!-- pause -->
+- Language Modules: ALGOL, OCaml, ML, Rust, Haskell
+- Function/Method
+- Class
+- Namespace
+- Assembly
+- Process (e.g. web APIs, pipes, other IPC)
+
+What is a Module > Example Forms
 ---
 <!-- incremental_lists: true -->
 
@@ -160,10 +190,6 @@ def sanitize(input_string):
   # the sanitization rules are a secret to this function
   return input_string.replace("'", "\\'")
 ```
-
-What is a Module > Example Forms > Classes
----
-<!-- incremental_lists: true -->
 
 <!-- pause -->
   - `private`, `protected` members
@@ -188,19 +214,19 @@ public class AsciiTools
   public bool IsAlphanumeric(int c) => c > _minChar;
 }
 ```
+<!-- column_layout: [1, 1, 1] -->
+
+<!-- column: 1 -->
+<!-- pause -->
+Q: These secrets are identical. Should they be merged?
 
 <!-- pause -->
-Question: These secrets are identical. Should they be merged?
+**A: No, because they have different specifications, i.e. reasons to change.**
+
+<!-- reset_layout -->
 
 <!-- pause -->
-**Answer: No, because they have different reasons to change**.
-
-
-What is a Module > Example Forms > Assemblies
----
-<!-- incremental_lists: true -->
-
-<!-- pause -->
+  - Assemblies
   - e.g. .dll, .so files
   - `internal` members
 
@@ -214,30 +240,20 @@ internal class ThisAssemblyOnly
 }
 ```
 
-What is a Module > Other Forms
----
-<!-- incremental_lists: true -->
-
-<!-- pause -->
-- Sometimes literally named "Modules"
-  - Early languages: ALGOL, OCaml, ML
-  - Newer languages: JavaScript, Rust, C++20
-- Sometimes called "Packages" (Dart, Go, Java)
-
 What is Modular Reasoning?
 ---
 <!-- incremental_lists: true -->
 
-The ability to make decisions about a module while looking only at its implementation and the specification (i.e. interface, i.e. contract) of other modules.
+The ability to make decisions about a module while looking only at its implementation and the specification (i.e. interface or contract) of other modules.
 
 <!-- pause -->
 Modular reasoning lets an engineer reason about the correctness of a module without reading the rest of the program.
 
 <!-- pause -->
-Question: How big should a module be?
+Q: How big should a module be?
 
 <!-- pause -->
-**Answer: From cognitive science \[1\]\[2\], humans can hold about 7 pieces of information in short-term memory. Modules should hold up to that amount.**
+**A: From cognitive science \[1\]\[2\], humans can hold about 7 pieces of information in short-term memory. Modules should hold up to that amount.**
 
 <!-- pause -->
 - \[1\] [](https://www.oreilly.com/library/view/code-that-fits/9780137464302/)
@@ -248,13 +264,7 @@ Design-Level Thinking
 <!-- incremental_lists: true -->
 
 - **Key idea**: Design is apart from the code.
-- Design is about a shared fiction
-- Just like Democracy does not exist
-  - US, Russia, and Ukranian Sovereignty
-- Newton's Law of Gravity is just a model
-  - and only approximately true at the scale of humans
-- These are patterns imposed by our minds on the world
-- Similarly, software design is a narrative over physical code
+- Software design is a narrative over physical code
   - **There can be many code implementations that satisfy a design**
 
 Design-Level Thinking > Example
@@ -296,6 +306,7 @@ public class Y : ICalculator
 
 Design-Level Thinking > Example
 ---
+<!-- incremental_lists: true -->
 
 > There can be many code implementations that satisfy a design
 
@@ -328,6 +339,65 @@ public class SafeCalculator : ICalculator
     };
 }
 ```
+
+One prevents division by zero
+
+Design-Level Thinking > Reverse-Engineering
+---
+<!-- incremental_lists: true -->
+
+<!-- pause -->
+Evidence for the level of design: Reverse-engineering 
+
+<!-- pause -->
+Reverse-engineering is only possible because design is separate from implementation.
+
+<!-- pause -->
+Imagine you need to rewrite a large program.
+
+<!-- pause -->
+All you have is the source code:
+
+<!-- pause -->
+  - no docs
+  - original authors were hit by a bus
+
+<!-- pause -->
+How would you do it?
+
+<!-- pause -->
+ - Whether you know it or not, you'd first extract a design, i.e. intentions and specifications.
+ - You'd then write your new program according to that design.
+ - You might to this iteratively.
+
+<!-- pause -->
+There's a catch: going from code to design is *lossy*.
+
+<!-- pause -->
+In pseudocode:
+
+```javascript
+    let code1 = ...
+    let design2 = reverse(code1)
+    let code2 = implement(design2)
+    assert(equivalent(code1, code2)) // Fails
+```
+
+The Three Levels of Program Correctness
+---
+<!-- incremental_lists: true -->
+
+<!-- pause -->
+Q: How do we know a program is correct?
+
+<!-- pause -->
+A: There are three approaches.
+
+<!-- pause -->
+- Runtime
+- Code
+- Logic
+
 The Three Levels of Program Correctness
 ---
 <!-- incremental_lists: true -->
@@ -348,6 +418,12 @@ The Three Levels of Program Correctness
 
 <!-- pause -->
 ![](img/locals.png)
+
+<!-- pause -->
+- All unit tests work at this level
+
+<!-- pause -->
+![](img/tests.png)
 
 <!-- pause -->
 Level 1 says:
@@ -373,9 +449,13 @@ public class RawCalculator : ICalculator
 int impossible = new RawCalculator(1, 0); // throws
 ```
 
+- Static analyzers work at this level
+
 <!-- pause -->
 Level 2 says:
 > A program is incorrect if there exists some environment or input under which it produces a wrong result
+
+<!-- pause -->
 
 The Three Levels of Program Correctness
 ---
@@ -385,7 +465,7 @@ The Three Levels of Program Correctness
 <!-- pause -->
 
 - Considers how the code is derived
-- At this level, we consider only the *abstract specification* (i.e. *interface*,  i.e. *contract*) of each module.
+- At this level, we consider only the *abstract specification* (i.e. *interface*, *contract*) of each module.
 - We don't look at any particular implementation.
 - We assume a module may be replaced at any time with a different implementation.
 - We can then determine the module's correctness by only looking at its code and the contracts of its dependencies.
@@ -409,9 +489,9 @@ Stable Guarantees
 <!-- incremental_lists: true -->
 
 <!-- pause -->
-## Stable Guarantee
+# Stable Guarantees
 
-- programming only to guarantees made by other modules' spec.
+- If we program only to guarantees made by other modules' spec, then we are programming *at the logic/design level*.
 
 <!-- pause -->
 ## Spec: Preconditions
@@ -428,6 +508,7 @@ Stable Guarantees
 
 Stable Guarantees
 ---
+<!-- incremental_lists: true -->
 
 <!-- pause -->
 ```csharp
@@ -461,15 +542,13 @@ Stable Guarantees > Precise Advice
 
 <!-- pause -->
 - Heard of "Defensive Coding"?
-  - More precise: Program to stable guarantees
-  - Think about preconditions, invariants and postconditions.
+  - **More precise**: Program to stable guarantees
+    - Think about preconditions, invariants and postconditions.
 - Heard of "Encapsulation"?
-  - More precise: think about modules and secrets.
-- Heard of Arrange, Act, Assert?
-  - More precise: the Hoare Triple, from Formal Methods
-  - `{P}C{Q}`
-  - [](https://en.wikipedia.org/wiki/Hoare_logic)
-
+  - **More precise**: think about modules and secrets.
+  - When using a module (function, class, etc)
+    - Always meet or exceed its assumptions.
+    - Only rely on its guarantees.
 
 Errors in Modular Reasoning
 ---
@@ -565,7 +644,7 @@ Review Quiz
   - A. Make smaller classes, functions, and files.
   - B. Feel smarter
   - C. Reason about code correctness without reading the rest of the program.
-  - **Answer: C**
+- **A: C**
 
 Summary
 ---
@@ -575,7 +654,7 @@ Summary
 - Our goal is not to just deliver correct software today.
 - It's to continue to deliver correct software far into the future.
 - We can do that by remembering Level 3, the layer of design and logic.
-- This practice is as valuable or more than robust automated tests.
+- With Modular Reasoning, we can confidently change large programs.
 
 Resources
 ---
